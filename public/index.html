@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8a1c55">
+<style>html{color-scheme:light}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Geleias da Beca</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: uma coluna de cartões, mobile primeiro. Metas do mês no topo (cada meta editável no próprio lugar), registro rápido, gráficos, custos por item, lista e resumo. */
+:root {
+  --bg: #f5f3f7;
+  --surface: #ffffff;
+  --fg: #1e1522;
+  --fg2: #5b4f61;
+  --muted: #7d7183;
+  --line: #e5dfe9;
+  --track: #ece6f0;
+  --accent: #8a1c55;
+  --accent-ink: #ffffff;
+  --accent-soft: #f6e6ee;
+  --good: #1b7a47;
+  --good-soft: #e3f2e9;
+  --warn: #8a5a00;
+  --warn-soft: #fbefd3;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #150f18; --surface: #201826; --fg: #f2ebf4; --fg2: #c9bdce; --muted: #9a8fa0;
+    --line: #33283a; --track: #2c2233; --accent: #e47aa8; --accent-ink: #1a0e14; --accent-soft: #3a1d2d;
+    --good: #4fcf8a; --good-soft: #173324; --warn: #f0b43f; --warn-soft: #3a2d12;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #150f18; --surface: #201826; --fg: #f2ebf4; --fg2: #c9bdce; --muted: #9a8fa0;
+  --line: #33283a; --track: #2c2233; --accent: #e47aa8; --accent-ink: #1a0e14; --accent-soft: #3a1d2d;
+  --good: #4fcf8a; --good-soft: #173324; --warn: #f0b43f; --warn-soft: #3a2d12;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 16px; }
+h1, h2, .num { font-family: var(--font-display); }
+h1 { font-size: 26px; line-height: 1.1; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 17px; margin: 0; letter-spacing: -0.005em; }
+.label { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.month { display: flex; align-items: center; gap: 4px; }
+.month span { min-width: 138px; text-align: center; font-weight: 600; text-transform: capitalize; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 12px 16px; font-weight: 600; min-height: 44px; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn.small { padding: 8px 12px; min-height: 36px; font-size: 13px; }
+.icon-btn { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; width: 40px; height: 40px; display: grid; place-items: center; }
+.banner { border-radius: 10px; padding: 10px 12px; background: var(--warn-soft); color: var(--warn); font-size: 13px; }
+.hero-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.pct { font-size: 52px; line-height: 0.95; font-weight: 800; letter-spacing: -0.02em; }
+.pct small { font-size: 22px; font-weight: 700; margin-left: 2px; }
+.amounts { font-variant-numeric: tabular-nums; color: var(--fg2); text-align: right; }
+.amounts b { color: var(--fg); font-weight: 600; }
+.bar { position: relative; height: 14px; background: var(--track); border-radius: 8px; }
+.bar.thin { height: 10px; }
+.bar > i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 8px; }
+.bar.done > i { background: var(--good); }
+.bar > u { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--fg); border-radius: 1px; text-decoration: none; }
+.bar-note { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 4px 10px 4px 8px; font-size: 13px; font-weight: 600; }
+.pill svg { flex: none; }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.neutral { background: var(--track); color: var(--fg2); }
+.goal { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+.goal-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.goal-top .figs { font-variant-numeric: tabular-nums; font-size: 14px; }
+.link-btn { background: none; border: 0; color: var(--accent); font-weight: 600; font-size: 13px; padding: 6px 0; min-height: 32px; }
+.editrow { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; background: var(--accent-soft); border-radius: 10px; padding: 10px; }
+.editrow .field { flex: 1 1 140px; }
+.editrow .field input { background: var(--surface); }
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kpi .num { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.kpi .hint { font-size: 12px; color: var(--muted); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--track); border-radius: 10px; padding: 3px; gap: 3px; }
+.seg button { border: 0; background: transparent; border-radius: 8px; padding: 10px; font-weight: 600; color: var(--fg2); min-height: 44px; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+form { display: flex; flex-direction: column; gap: 12px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label { font-size: 12px; color: var(--fg2); font-weight: 600; }
+.field input, .field select { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-height: 44px; width: 100%; min-width: 0; }
+.field.span2 { grid-column: 1 / -1; }
+.check { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; grid-column: 1 / -1; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent); }
+.total-line { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.total-line .num { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.chart-svg { width: 100%; height: auto; display: block; }
+.chart-svg text { fill: var(--fg2); font-family: var(--font-body); font-size: 11px; }
+.chart-svg .val { fill: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.chart-svg .axis { stroke: var(--line); }
+.chart-svg .barfill { fill: var(--accent); }
+.hbars { display: flex; flex-direction: column; gap: 12px; }
+.hrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; }
+.hrow .name { overflow-wrap: anywhere; font-weight: 500; }
+.hrow .v { font-variant-numeric: tabular-nums; color: var(--fg2); font-size: 13px; text-align: right; }
+.hrow .t { grid-column: 1 / -1; height: 10px; background: var(--track); border-radius: 5px; position: relative; }
+.hrow .t i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 5px; }
+.empty { color: var(--muted); font-size: 14px; padding: 6px 0; }
+.list { display: flex; flex-direction: column; }
+.row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.row:first-child { border-top: 0; }
+.row .d { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.row .main { min-width: 0; }
+.row .main b { font-weight: 600; overflow-wrap: anywhere; }
+.row .meta { font-size: 12px; color: var(--muted); }
+.row .amt { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; white-space: nowrap; }
+.row .acts { grid-column: 2 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.row .acts button { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 12px; min-height: 32px; color: var(--fg2); }
+.row .acts button.danger { color: var(--warn); border-color: var(--warn); }
+.resumo { white-space: pre-wrap; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 14px; user-select: all; }
+.toast { position: fixed; left: 0; right: 0; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: center; pointer-events: none; padding-inline: 16px; }
+.toast span { background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 14px; opacity: 0; transition: opacity 0.2s; }
+.toast.on span { opacity: 1; }
+.cats-hint { margin: 0; font-size: 13px; color: var(--muted); }
+.catsec { display: flex; flex-direction: column; gap: 8px; }
+.catsec + .catsec { padding-top: 14px; border-top: 1px solid var(--line); }
+.catlist { display: flex; flex-direction: column; gap: 4px; }
+.catrow { display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line); }
+.catrow:first-child { border-top: 0; }
+.catrow .catname { min-width: 0; overflow-wrap: anywhere; font-weight: 500; flex: 1 1 140px; }
+.catrow .catname .meta { font-size: 12px; color: var(--muted); font-weight: 400; }
+.catrow.editing, .catrow.add { align-items: flex-end; background: var(--accent-soft); border-radius: 10px; padding: 10px; border-top: 0; margin-top: 6px; }
+.catrow .field { flex: 1 1 140px; }
+.catrow.editing .field input, .catrow.editing .field select, .catrow.add .field input, .catrow.add .field select { background: var(--surface); }
+.catacts { display: flex; gap: 8px; flex-wrap: wrap; }
+.catacts button:not(.btn) { background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 12px; min-height: 32px; color: var(--fg2); }
+.catacts button.danger { color: var(--warn); border-color: var(--warn); }
+@media (min-width: 560px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="label">Painel de gestão</div>
+      <h1>Geleias da Beca</h1>
+    </div>
+    <div class="month" role="group" aria-label="Mês">
+      <button class="icon-btn" id="prev" aria-label="Mês anterior"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button>
+      <span id="monthLabel"></span>
+      <button class="icon-btn" id="next" aria-label="Próximo mês"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 3 5 5-5 5"/></svg></button>
+    </div>
+  </div>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <section class="card" id="hero" aria-label="Metas do mês"></section>
+
+  <section class="kpis" id="kpis" aria-label="Números do mês"></section>
+
+  <section class="card" aria-labelledby="addTitle">
+    <h2 id="addTitle">Registrar</h2>
+    <div class="seg" role="group" aria-label="Tipo de lançamento">
+      <button type="button" id="segVenda" aria-pressed="true">Venda</button>
+      <button type="button" id="segGasto" aria-pressed="false">Compra de insumo</button>
+    </div>
+    <form id="form" autocomplete="off">
+      <div class="grid2">
+        <div class="field span2" id="fSabor"><label for="sabor">Sabor</label>
+          <select id="sabor"><option>Morango tradicional</option><option>Morango diet</option></select></div>
+        <div class="field" id="fQtd"><label for="qtd">Potes</label><input id="qtd" type="number" inputmode="numeric" min="1" step="1" value="1"></div>
+        <div class="field" id="fPreco"><label for="preco">Preço por pote (R$)</label><input id="preco" inputmode="decimal" placeholder="0,00"></div>
+        <div class="field span2" id="fCanal"><label for="canal">Canal</label>
+          <select id="canal"><option>Feira</option><option>WhatsApp</option><option>Instagram</option><option>Encomenda</option><option>Indicação</option><option>Outro</option></select></div>
+        <div class="field span2" id="fItem" hidden><label for="item">Item</label>
+          <select id="item"><option>Morango</option><option>Açúcar</option><option>Adoçante</option><option>Limão</option><option>Saco de organza</option><option>Adesivo</option><option>Outros</option></select></div>
+        <div class="field" id="fQtdItem" hidden><label for="qtdItem" id="qtdItemLabel">Quantidade (kg)</label><input id="qtdItem" inputmode="decimal" placeholder="0"></div>
+        <div class="field" id="fValor" hidden><label for="valor">Valor pago (R$)</label><input id="valor" inputmode="decimal" placeholder="0,00"></div>
+        <div class="field span2" id="fDesc" hidden><label for="desc">Observação (opcional)</label><input id="desc" placeholder="Ex.: comprado na feira, caixa de 6 kg"></div>
+        <div class="field span2"><label for="data">Data</label><input id="data" type="date"></div>
+        <label class="check" id="fPago"><input id="pago" type="checkbox" checked> Já recebi o pagamento</label>
+      </div>
+      <div class="total-line">
+        <div><div class="label">Total</div><div class="num" id="totalPrev">R$ 0,00</div></div>
+        <button class="btn" id="save" type="submit">Registrar venda</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card" aria-labelledby="wkTitle">
+    <h2 id="wkTitle">Vendas por semana</h2>
+    <div id="weekChart"></div>
+  </section>
+
+  <section class="card" aria-labelledby="flTitle">
+    <h2 id="flTitle">Vendas por sabor</h2>
+    <div id="flavors"></div>
+  </section>
+
+  <section class="card" aria-labelledby="csTitle">
+    <h2 id="csTitle">Gastos por item</h2>
+    <div id="costs"></div>
+  </section>
+
+  <section class="card" aria-labelledby="lsTitle">
+    <h2 id="lsTitle">Lançamentos do mês</h2>
+    <div class="list" id="list"></div>
+    <button class="btn ghost small" id="more" hidden style="align-self:flex-start"></button>
+  </section>
+
+  <section class="card" aria-labelledby="ctTitle">
+    <h2 id="ctTitle">Categorias</h2>
+    <div id="cats"></div>
+  </section>
+
+  <section class="card" aria-labelledby="rsTitle">
+    <h2 id="rsTitle">Prestação de contas</h2>
+    <div class="resumo" id="resumo"></div>
+    <button class="btn" id="copy" type="button" style="align-self:flex-start">Copiar resumo</button>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span></span></div>
+
+<script src="/db-shim.js"></script>
+<script>
+(function () {
+  var BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  var INT = new Intl.NumberFormat('pt-BR');
+  var DEC = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
+  function $(id) { return document.getElementById(id); }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function todayStr() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function ymOf(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function parseMoney(s) { var t = String(s || '').trim().replace(/[R$\s]/g, ''); if (!t) return NaN; if (t.indexOf(',') > -1) t = t.replace(/\./g, '').replace(',', '.'); var n = parseFloat(t); return isFinite(n) ? n : NaN; }
+  function short(n) { return 'R$ ' + INT.format(Math.round(n)); }
+
+  var SABORES_PADRAO = ['Morango tradicional', 'Morango diet'];
+  var ITENS_PADRAO = [{ name: 'Morango', unit: 'kg' }, { name: 'Açúcar', unit: '' }, { name: 'Adoçante', unit: '' }, { name: 'Limão', unit: '' }, { name: 'Saco de organza', unit: 'un' }, { name: 'Adesivo', unit: 'un' }, { name: 'Outros', unit: '' }];
+  var CANAIS_PADRAO = ['Feira', 'WhatsApp', 'Instagram', 'Encomenda', 'Indicação', 'Outro'];
+  var CANAIS = CANAIS_PADRAO.slice();
+  var SABORES = SABORES_PADRAO.slice(), ITENS_LIST = [], ITENS = Object.create(null);
+  var METAS_SUGERIDAS = { receita: 2000, 'Morango tradicional': 50, 'Morango diet': 30 };
+  var S = { all: [], ym: ymOf(new Date()), tipo: 'venda', metas: null, showAll: false, db: null, canWrite: true, loaded: false, slow: false, confirmDel: null, editing: null, editVal: '', cats: null, catEdit: null, catConfirm: null, draft: { sabor: '', item: '', canal: '', unit: '' }, editDraft: { name: '', unit: '' } };
+
+  function applyCats() {
+    var c = S.cats;
+    SABORES = c && c.sabores.length ? c.sabores.slice() : SABORES_PADRAO.slice();
+    CANAIS = c && c.canais && c.canais.length ? c.canais.slice() : CANAIS_PADRAO.slice();
+    ITENS_LIST = (c && c.itens.length ? c.itens : ITENS_PADRAO).map(function (x) { return { name: x.name, unit: x.unit }; });
+    ITENS = Object.create(null);
+    ITENS_LIST.forEach(function (x) { ITENS[x.name] = { unit: x.unit, label: x.unit ? 'Quantidade (' + x.unit + ')' : 'Quantidade (opcional)' }; });
+  }
+  function fillSelects() {
+    var sv = $('sabor').value, iv = $('item').value, cv = $('canal').value;
+    $('sabor').innerHTML = SABORES.map(function (n) { return '<option>' + esc(n) + '</option>'; }).join('');
+    $('item').innerHTML = ITENS_LIST.map(function (x) { return '<option>' + esc(x.name) + '</option>'; }).join('');
+    if (SABORES.indexOf(sv) > -1) $('sabor').value = sv;
+    if (ITENS[iv]) $('item').value = iv;
+    $('canal').innerHTML = CANAIS.map(function (n) { return '<option>' + esc(n) + '</option>'; }).join('');
+    if (CANAIS.indexOf(cv) > -1) $('canal').value = cv;
+    itemChanged();
+  }
+  var toastTimer, slowTimer;
+
+  function toast(msg) { var t = $('toast'); t.firstChild.textContent = msg; t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('on'); }, 2600); }
+  function metas() { var m = Object.assign({}, METAS_SUGERIDAS, S.metas || {}); SABORES.forEach(function (s) { if (!(m[s] > 0)) m[s] = 30; }); return m; }
+
+  function monthInfo(ym) { var p = ym.split('-'); var y = +p[0], m = +p[1]; return { y: y, m: m, dim: new Date(y, m, 0).getDate(), label: new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) }; }
+  function shiftMonth(ym, k) { var i = monthInfo(ym); return ymOf(new Date(i.y, i.m - 1 + k, 1)); }
+
+  function monthData() {
+    var rows = S.all.filter(function (e) { return e && e.data && e.data.indexOf(S.ym) === 0; });
+    var v = rows.filter(function (e) { return e.tipo === 'venda'; });
+    var g = rows.filter(function (e) { return e.tipo === 'gasto'; });
+    var sum = function (a, f) { return a.reduce(function (s, e) { return s + (+e[f] || 0); }, 0); };
+    var vendido = sum(v, 'total'), despesa = sum(g, 'total'), jarros = sum(v, 'qtd');
+    var areceber = v.filter(function (e) { return e.pago === false; }).reduce(function (s, e) { return s + (+e.total || 0); }, 0);
+    var fl = {};
+    SABORES.forEach(function (k) { fl[k] = { name: k, qtd: 0, total: 0 }; });
+    v.forEach(function (e) { var k = e.sabor || 'Outro'; if (!fl[k]) fl[k] = { name: k, qtd: 0, total: 0 }; fl[k].qtd += (+e.qtd || 0); fl[k].total += (+e.total || 0); });
+    var it = {};
+    g.forEach(function (e) { var k = e.item || e.categoria || 'Outros'; if (!it[k]) it[k] = { name: k, total: 0, qtd: 0 }; it[k].total += (+e.total || 0); it[k].qtd += (+e.qtdItem || 0); });
+    var itens = Object.keys(it).map(function (k) { return it[k]; }).sort(function (a, b) { return b.total - a.total; });
+    return { rows: rows, vendas: v, gastos: g, vendido: vendido, despesa: despesa, lucro: vendido - despesa, jarros: jarros, areceber: areceber, flavors: fl, itens: itens };
+  }
+
+  var ICON_OK = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="m5.2 8.2 2 2 3.6-4"/></svg>';
+  var ICON_WARN = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.2 14.2 13H1.8z"/><path d="M8 6.6v3"/><path d="M8 11.6h.01"/></svg>';
+  var ICON_INFO = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M8 7.4V11"/><path d="M8 5h.01"/></svg>';
+
+  function paceInfo(done, meta, money) {
+    var now = new Date(), cur = ymOf(now), mi = monthInfo(S.ym);
+    if (meta > 0 && done >= meta) return { cls: 'good', icon: ICON_OK, text: 'Meta batida', note: '', tick: null };
+    if (S.ym < cur) return { cls: 'neutral', icon: ICON_INFO, text: 'Mês encerrado', note: '', tick: null };
+    if (S.ym > cur) return { cls: 'neutral', icon: ICON_INFO, text: 'Mês ainda não começou', note: '', tick: null };
+    var day = now.getDate(), esperado = meta * day / mi.dim, restantes = mi.dim - day + 1;
+    var ok = done >= esperado, falta = Math.max(0, meta - done) / restantes;
+    return { cls: ok ? 'good' : 'warn', icon: ok ? ICON_OK : ICON_WARN, text: ok ? 'No ritmo' : 'Abaixo do ritmo', tick: Math.min(100, esperado / meta * 100), esperado: esperado,
+      note: 'Para bater a meta: ' + (money ? BRL.format(falta) : DEC.format(Math.ceil(falta * 10) / 10)) + (money ? ' por dia' : ' potes por dia') };
+  }
+
+  function goalBlock(key, title, done, meta, money, big) {
+    var pct = meta > 0 ? done / meta : 0, p = paceInfo(done, meta, money), editing = S.editing === key;
+    var figs = money ? '<b>' + BRL.format(done) + '</b> de ' + BRL.format(meta) : '<b>' + INT.format(done) + '</b> de ' + INT.format(meta) + ' potes';
+    var h = '<div class="goal" data-goal="' + esc(key) + '">';
+    if (big) {
+      h += '<div class="hero-top"><div><div class="label">' + title + '</div><div class="num pct">' + Math.round(pct * 100) + '<small>%</small></div></div>';
+      h += '<div class="amounts"><div>' + figs + '</div><div>' + (meta > done ? 'faltam ' + BRL.format(meta - done) : 'meta cumprida') + '</div></div></div>';
+    } else {
+      h += '<div class="goal-top"><span class="label">' + title + '</span><span class="figs">' + figs + ' · ' + Math.round(pct * 100) + '%</span></div>';
+    }
+    h += '<div class="bar' + (big ? '' : ' thin') + (pct >= 1 ? ' done' : '') + '" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.min(100, Math.round(pct * 100)) + '" aria-label="' + esc(title) + '"><i style="width:' + Math.min(100, pct * 100) + '%"></i>' + (p.tick != null ? '<u style="left:calc(' + p.tick + '% - 1px)" title="Onde vocês deveriam estar hoje"></u>' : '') + '</div>';
+    h += '<div class="bar-note"><span class="pill ' + p.cls + '">' + p.icon + p.text + '</span><span>' + esc(p.note || '') + '</span></div>';
+    if (big && p.tick != null) h += '<div class="bar-note"><span>A marca vertical é o ponto esperado para hoje: ' + BRL.format(p.esperado) + '</span></div>';
+    if (editing) {
+      h += '<div class="editrow"><div class="field"><label for="editInput">' + (money ? 'Nova meta de vendas (R$)' : 'Nova meta de potes') + '</label><input id="editInput" inputmode="' + (money ? 'decimal' : 'numeric') + '" value="' + esc(S.editVal) + '"></div>';
+      h += '<button class="btn small" type="button" data-act="saveMeta" data-key="' + esc(key) + '"' + (S.db && S.canWrite ? '' : ' disabled') + '>Salvar</button><button class="btn ghost small" type="button" data-act="cancelMeta">Cancelar</button></div>';
+    } else {
+      h += '<div><button class="link-btn" type="button" data-act="editMeta" data-key="' + esc(key) + '">Editar meta' + (S.metas && S.metas[key] != null ? '' : ' (sugerida)') + '</button></div>';
+    }
+    return h + '</div>';
+  }
+
+  function renderHero(d) {
+    var m = metas(), wasFocus = document.activeElement && document.activeElement.id === 'editInput';
+    var h = goalBlock('receita', 'Meta de vendas do mês', d.vendido, m.receita, true, true);
+    SABORES.forEach(function (s) { h += goalBlock(s, 'Potes de ' + s.toLowerCase(), d.flavors[s].qtd, m[s], false, false); });
+    $('hero').innerHTML = h;
+    var inp = $('editInput');
+    if (inp) {
+      inp.addEventListener('input', function () { S.editVal = inp.value; });
+      inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveMeta(S.editing); } if (e.key === 'Escape') { S.editing = null; renderAll(); } });
+      if (wasFocus || S.justOpened) { inp.focus(); inp.select(); S.justOpened = false; }
+    }
+  }
+
+  function renderKpis(d) {
+    var porPote = d.jarros > 0 ? BRL.format(d.despesa / d.jarros) + ' de gasto por pote vendido' : 'vendido menos gastos';
+    var items = [
+      ['Vendido', BRL.format(d.vendido), INT.format(d.jarros) + (d.jarros === 1 ? ' pote' : ' potes')],
+      ['Gastos', BRL.format(d.despesa), d.gastos.length + (d.gastos.length === 1 ? ' compra' : ' compras')],
+      ['Lucro', BRL.format(d.lucro), porPote],
+      ['A receber', BRL.format(d.areceber), d.areceber > 0 ? 'vendas ainda não pagas' : 'nada pendente']
+    ];
+    $('kpis').innerHTML = items.map(function (k) { return '<div class="kpi"><div class="label">' + k[0] + '</div><div class="num">' + k[1] + '</div><div class="hint">' + k[2] + '</div></div>'; }).join('');
+  }
+
+  function weekChart(d) {
+    var mi = monthInfo(S.ym), n = mi.dim > 28 ? 5 : 4, vals = [], labels = [];
+    for (var i = 0; i < n; i++) { vals.push(0); var a = i * 7 + 1, b = i === 4 ? mi.dim : Math.min(mi.dim, a + 6); labels.push(a === b ? String(a) : a + '–' + b); }
+    d.vendas.forEach(function (e) { var day = parseInt(e.data.slice(8, 10), 10) || 1; vals[Math.min(Math.floor((day - 1) / 7), n - 1)] += (+e.total || 0); });
+    var max = Math.max.apply(null, vals), W = 320, H = 170, top = 22, bot = 26, left = 8, right = 8;
+    if (max <= 0) return '<div class="empty">Sem vendas em ' + esc(mi.label) + ' ainda. A primeira venda registrada aparece aqui.</div>';
+    var slot = (W - left - right) / n, bw = Math.min(46, slot * 0.58), ch = H - top - bot, s = '<svg class="chart-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Vendas por semana em ' + esc(mi.label) + '">';
+    s += '<line class="axis" x1="' + left + '" x2="' + (W - right) + '" y1="' + (H - bot) + '" y2="' + (H - bot) + '"/>';
+    vals.forEach(function (v, i) {
+      var h = v / max * ch, x = left + slot * i + (slot - bw) / 2, y = H - bot - h, r = Math.min(4, h);
+      if (v > 0) s += '<path class="barfill" d="M' + x + ' ' + (H - bot) + 'V' + (y + r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'H' + (x + bw - r) + 'Q' + (x + bw) + ' ' + y + ' ' + (x + bw) + ' ' + (y + r) + 'V' + (H - bot) + 'Z"><title>Dias ' + labels[i] + ': ' + BRL.format(v) + '</title></path>';
+      s += '<text class="val" text-anchor="middle" x="' + (x + bw / 2) + '" y="' + (v > 0 ? y - 6 : H - bot - 6) + '">' + (v > 0 ? short(v) : '–') + '</text>';
+      s += '<text text-anchor="middle" x="' + (x + bw / 2) + '" y="' + (H - 8) + '">' + labels[i] + '</text>';
+    });
+    return s + '</svg><div class="bar-note"><span>Dias do mês em cada semana. Valores em reais vendidos.</span></div>';
+  }
+
+  function flavorChart(d) {
+    var list = Object.keys(d.flavors).map(function (k) { return d.flavors[k]; });
+    var max = Math.max.apply(null, list.map(function (f) { return f.qtd; })) || 1;
+    return '<div class="hbars">' + list.map(function (f) { return '<div class="hrow"><span class="name">' + esc(f.name) + '</span><span class="v">' + INT.format(f.qtd) + (f.qtd === 1 ? ' pote' : ' potes') + ' · ' + BRL.format(f.total) + '</span><div class="t"><i style="width:' + (f.qtd / max * 100) + '%"></i></div></div>'; }).join('') + '</div>';
+  }
+
+  function costChart(d) {
+    if (!d.itens.length) return '<div class="empty">Nenhuma compra de insumo em ' + esc(monthInfo(S.ym).label) + '. Registre morango, açúcar, adoçante, limão, sacos de organza e adesivos aqui.</div>';
+    var max = d.itens[0].total || 1;
+    var h = '<div class="hbars">' + d.itens.map(function (x) {
+      var u = ITENS[x.name] && ITENS[x.name].unit;
+      var q = x.qtd > 0 ? DEC.format(x.qtd) + (u ? ' ' + u : '') + ' · ' : '';
+      return '<div class="hrow"><span class="name">' + esc(x.name) + '</span><span class="v">' + q + BRL.format(x.total) + '</span><div class="t"><i style="width:' + (x.total / max * 100) + '%"></i></div></div>';
+    }).join('') + '</div>';
+    if (d.jarros > 0) h += '<div class="bar-note"><span>Gasto por pote vendido no mês: ' + BRL.format(d.despesa / d.jarros) + '. Compras feitas para estoque entram no mês da compra.</span></div>';
+    return h;
+  }
+
+  function renderList(d) {
+    var rows = d.rows.slice().sort(function (a, b) { return a.data < b.data ? 1 : a.data > b.data ? -1 : (b.criado || 0) - (a.criado || 0); });
+    var el = $('list');
+    if (!rows.length) { el.innerHTML = '<div class="empty">' + (S.loaded ? 'Nada registrado em ' + esc(monthInfo(S.ym).label) + '. Use o formulário acima para lançar a primeira venda ou compra.' : 'Carregando lançamentos...') + '</div>'; $('more').hidden = true; return; }
+    var shown = S.showAll ? rows : rows.slice(0, 8);
+    el.innerHTML = shown.map(function (e) {
+      var isV = e.tipo === 'venda', day = e.data.slice(8, 10) + '/' + e.data.slice(5, 7);
+      var title, meta;
+      if (isV) { title = esc(e.sabor || 'Venda') + ' <span class="meta">× ' + INT.format(+e.qtd || 0) + '</span>'; meta = esc(e.canal || '') + (e.preco ? ' · ' + BRL.format(+e.preco) + ' cada' : ''); }
+      else { var nm = e.item || e.categoria || 'Compra', u = ITENS[nm] && ITENS[nm].unit; title = esc(nm); meta = [(+e.qtdItem > 0 ? DEC.format(+e.qtdItem) + (u ? ' ' + u : '') : ''), e.desc || ''].filter(Boolean).map(esc).join(' · '); }
+      var pending = isV && e.pago === false;
+      var h = '<div class="row"><div class="d">' + day + '</div><div class="main"><b>' + title + '</b><div class="meta">' + meta + (pending ? ' · <span class="pill warn" style="padding:1px 8px">A receber</span>' : '') + '</div></div>';
+      h += '<div class="amt">' + (isV ? '+' : '−') + ' ' + BRL.format(+e.total || 0) + '</div>';
+      if (S.canWrite && S.db) {
+        h += '<div class="acts">';
+        if (pending) h += '<button type="button" data-act="paid" data-id="' + esc(e.id) + '">Marcar como recebido</button>';
+        h += '<button type="button" class="' + (S.confirmDel === e.id ? 'danger' : '') + '" data-act="del" data-id="' + esc(e.id) + '">' + (S.confirmDel === e.id ? 'Toque de novo para apagar' : 'Apagar') + '</button></div>';
+      }
+      return h + '</div>';
+    }).join('');
+    var more = $('more');
+    more.hidden = rows.length <= 8;
+    more.textContent = S.showAll ? 'Mostrar só os 8 últimos' : 'Ver todos os ' + rows.length + ' lançamentos';
+  }
+
+  function resumoText(d) {
+    var m = metas(), mi = monthInfo(S.ym), pr = m.receita > 0 ? Math.round(d.vendido / m.receita * 100) : 0;
+    var t = 'Geleias da Beca: resumo de ' + mi.label + '\n\n';
+    t += 'Vendido: ' + BRL.format(d.vendido) + ' (' + pr + '% da meta de ' + BRL.format(m.receita) + ')\n';
+    SABORES.forEach(function (s) { var q = d.flavors[s].qtd; t += s + ': ' + INT.format(q) + ' de ' + INT.format(m[s]) + ' potes (' + (m[s] > 0 ? Math.round(q / m[s] * 100) : 0) + '%)\n'; });
+    t += 'Gastos: ' + BRL.format(d.despesa) + '\n';
+    t += 'Lucro: ' + BRL.format(d.lucro) + '\n';
+    t += 'A receber: ' + BRL.format(d.areceber);
+    if (d.itens.length) t += '\n\nGastos por item: ' + d.itens.map(function (x) { return x.name + ' ' + BRL.format(x.total); }).join(', ');
+    return t;
+  }
+
+  function renderAll() {
+    var d = monthData();
+    $('monthLabel').textContent = monthInfo(S.ym).label;
+    renderHero(d); renderKpis(d);
+    $('weekChart').innerHTML = weekChart(d);
+    $('flavors').innerHTML = flavorChart(d);
+    $('costs').innerHTML = costChart(d);
+    renderCats();
+    renderList(d);
+    $('resumo').textContent = resumoText(d);
+    var b = $('banner');
+    if (!S.db) { b.hidden = false; b.textContent = 'Os lançamentos não podem ser salvos agora. Recarregue a página.'; }
+    else if (!S.canWrite) { b.hidden = false; b.textContent = 'Você pode ver os números, mas não registrar. Peça acesso de colaborador a quem compartilhou o painel.'; }
+    else if (S.err) { b.hidden = false; b.textContent = 'Não consegui carregar os dados. Recarregue a página e entre de novo se o login pedir.'; }
+    else if (S.slow && !S.loaded) { b.hidden = false; b.textContent = 'Os dados demoraram a chegar. Confira a conexão; o painel continua tentando.'; }
+    else b.hidden = true;
+    $('save').disabled = !(S.db && S.canWrite);
+  }
+
+  /* formulário */
+  function setTipo(t) {
+    S.tipo = t;
+    $('segVenda').setAttribute('aria-pressed', t === 'venda');
+    $('segGasto').setAttribute('aria-pressed', t === 'gasto');
+    var v = t === 'venda';
+    ['fSabor', 'fQtd', 'fPreco', 'fCanal', 'fPago'].forEach(function (id) { $(id).hidden = !v; });
+    ['fItem', 'fQtdItem', 'fValor', 'fDesc'].forEach(function (id) { $(id).hidden = v; });
+    $('save').textContent = v ? 'Registrar venda' : 'Registrar compra';
+    itemChanged(); prev();
+  }
+  function itemChanged() { var it = ITENS[$('item').value] || { label: 'Quantidade (opcional)' }; $('qtdItemLabel').textContent = it.label; }
+  function prev() {
+    var tot = S.tipo === 'venda' ? (parseInt($('qtd').value, 10) || 0) * (parseMoney($('preco').value) || 0) : (parseMoney($('valor').value) || 0);
+    $('totalPrev').textContent = BRL.format(tot);
+  }
+  function lastPrice(sabor) {
+    var best = null;
+    S.all.forEach(function (e) { if (e.tipo === 'venda' && e.sabor === sabor && e.preco && (!best || (e.criado || 0) > (best.criado || 0))) best = e; });
+    return best ? +best.preco : null;
+  }
+  function fillPrice() { var p = lastPrice($('sabor').value); $('preco').value = p != null ? String(p).replace('.', ',') : ''; prev(); }
+
+  async function submit(ev) {
+    ev.preventDefault();
+    if (!S.db || !S.canWrite) return;
+    var e = { tipo: S.tipo, data: $('data').value || todayStr(), criado: Date.now() };
+    if (S.tipo === 'venda') {
+      var q = parseInt($('qtd').value, 10), p = parseMoney($('preco').value);
+      if (!(q > 0)) { toast('Informe quantos potes.'); $('qtd').focus(); return; }
+      if (!(p >= 0)) { toast('Informe o preço por pote.'); $('preco').focus(); return; }
+      e.sabor = $('sabor').value; e.qtd = q; e.preco = p; e.total = Math.round(q * p * 100) / 100; e.canal = $('canal').value; e.pago = $('pago').checked;
+    } else {
+      var v = parseMoney($('valor').value), qi = parseMoney($('qtdItem').value);
+      if (!(v > 0)) { toast('Informe o valor pago.'); $('valor').focus(); return; }
+      e.item = $('item').value; e.total = Math.round(v * 100) / 100;
+      if (qi > 0) e.qtdItem = qi;
+      if ($('desc').value.trim()) e.desc = $('desc').value.trim();
+    }
+    $('save').disabled = true;
+    try {
+      await S.db.collection('lancamentos').add(e);
+      S.ym = e.data.slice(0, 7);
+      toast(S.tipo === 'venda' ? 'Venda registrada: ' + BRL.format(e.total) : 'Compra registrada: ' + BRL.format(e.total));
+      if (S.tipo === 'venda') { $('qtd').value = '1'; } else { $('valor').value = ''; $('qtdItem').value = ''; $('desc').value = ''; }
+      prev();
+    } catch (err) {
+      toast(err && err.code === 'quota_exceeded' ? 'O limite de lançamentos foi atingido.' : 'Não consegui salvar. Tente de novo.');
+    }
+    renderAll();
+  }
+
+  async function saveMeta(key) {
+    var raw = $('editInput') ? $('editInput').value : S.editVal, isMoney = key === 'receita';
+    var val = isMoney ? parseMoney(raw) : parseInt(raw, 10);
+    if (!(val > 0)) { toast('Informe uma meta maior que zero.'); return; }
+    var next = Object.assign({}, metas()); next[key] = val;
+    try { await S.db.doc('config/metas').set(next); S.metas = next; S.editing = null; toast('Meta salva'); } catch (e) { toast('Não consegui salvar a meta.'); }
+    renderAll();
+  }
+
+  /* categorias */
+  var UNITS = [['', 'sem unidade'], ['kg', 'kg'], ['g', 'g'], ['L', 'litros'], ['un', 'unidades']];
+  function unitSelect(id, cur) { return '<select id="' + id + '" aria-label="Unidade">' + UNITS.map(function (u) { return '<option value="' + u[0] + '"' + (u[0] === cur ? ' selected' : '') + '>' + u[1] + '</option>'; }).join('') + '</select>'; }
+  function catSection(kind, title, list, can) {
+    var h = '<div class="catsec"><div class="label">' + title + '</div><div class="catlist">';
+    list.forEach(function (x) {
+      var editing = S.catEdit && S.catEdit.kind === kind && S.catEdit.name === x.name;
+      if (editing) {
+        h += '<div class="catrow editing"><div class="field"><label for="catEditName">Nome</label><input id="catEditName" maxlength="40" value="' + esc(S.editDraft.name) + '"></div>';
+        if (kind === 'item') h += '<div class="field"><label for="catEditUnit">Unidade</label>' + unitSelect('catEditUnit', S.editDraft.unit) + '</div>';
+        h += '<div class="catacts"><button class="btn small" type="button" data-act="saveCat">Salvar</button><button class="btn ghost small" type="button" data-act="cancelCat">Cancelar</button></div></div>';
+      } else {
+        var conf = S.catConfirm === kind + ':' + x.name;
+        h += '<div class="catrow"><span class="catname">' + esc(x.name) + (x.unit ? ' <span class="meta">(' + esc(x.unit) + ')</span>' : '') + '</span>';
+        if (can) h += '<span class="catacts"><button type="button" data-act="editCat" data-kind="' + kind + '" data-name="' + esc(x.name) + '">Editar</button><button type="button" class="' + (conf ? 'danger' : '') + '" data-act="delCat" data-kind="' + kind + '" data-name="' + esc(x.name) + '">' + (conf ? 'Toque de novo para remover' : 'Remover') + '</button></span>';
+        h += '</div>';
+      }
+    });
+    if (can) {
+      var nid = kind === 'sabor' ? 'newSabor' : kind === 'canal' ? 'newCanal' : 'newItem';
+      h += '<div class="catrow add"><div class="field"><label for="' + nid + '">' + (kind === 'sabor' ? 'Novo sabor' : kind === 'canal' ? 'Novo canal' : 'Novo insumo') + '</label><input id="' + nid + '" maxlength="40" value="' + esc(S.draft[kind]) + '" placeholder="' + (kind === 'sabor' ? 'Ex.: Morango com pimenta' : kind === 'canal' ? 'Ex.: Mercado do bairro' : 'Ex.: Pote de vidro') + '"></div>';
+      if (kind === 'item') h += '<div class="field"><label for="newUnit">Unidade</label>' + unitSelect('newUnit', S.draft.unit) + '</div>';
+      h += '<button class="btn small" type="button" data-act="addCat" data-kind="' + kind + '">Adicionar</button></div>';
+    }
+    return h + '</div></div>';
+  }
+  function renderCats() {
+    var el = $('cats'), ae = document.activeElement, fid = ae && el.contains(ae) ? ae.id : null, pos = fid && typeof ae.selectionStart === 'number' ? ae.selectionStart : null;
+    var can = !!(S.db && S.canWrite);
+    el.innerHTML = '<p class="cats-hint">Sabores, insumos e canais aparecem nos formulários, nas metas e nos gráficos. Lançamentos antigos nunca são apagados.</p>' + catSection('sabor', 'Sabores', SABORES.map(function (n) { return { name: n }; }), can) + catSection('item', 'Insumos', ITENS_LIST, can) + catSection('canal', 'Canais de venda', CANAIS.map(function (n) { return { name: n }; }), can);
+    if (fid && $(fid)) { $(fid).focus(); try { if (pos != null) $(fid).setSelectionRange(pos, pos); } catch (e) {} }
+  }
+  function curCats() { return { sabores: SABORES.slice(), canais: CANAIS.slice(), itens: ITENS_LIST.map(function (x) { return { name: x.name, unit: x.unit }; }) }; }
+  function nameError(kind, name, except) {
+    if (!name) return 'Escreva o nome.';
+    if (/^__/.test(name) || (kind === 'sabor' && name.toLowerCase() === 'receita')) return 'Escolha outro nome.';
+    var lst = kind === 'sabor' ? SABORES : kind === 'canal' ? CANAIS : ITENS_LIST.map(function (x) { return x.name; });
+    return lst.some(function (n) { return n !== except && n.toLowerCase() === name.toLowerCase(); }) ? 'Esse nome já existe.' : '';
+  }
+  async function saveCats(next, okMsg) {
+    try { await S.db.doc('config/categorias').set(next); S.cats = next; applyCats(); fillSelects(); toast(okMsg); return true; }
+    catch (e) { toast('Não consegui salvar as categorias.'); return false; }
+  }
+  async function addCat(kind) {
+    if (!S.db || !S.canWrite) return;
+    var name = (S.draft[kind] || '').trim(), err = nameError(kind, name, null);
+    if (err) { toast(err); return; }
+    var c = curCats();
+    if (kind === 'sabor') c.sabores.push(name); else if (kind === 'canal') c.canais.push(name); else c.itens.push({ name: name, unit: S.draft.unit || '' });
+    if (await saveCats(c, kind === 'sabor' ? 'Sabor adicionado' : kind === 'canal' ? 'Canal adicionado' : 'Insumo adicionado')) { S.draft[kind] = ''; if (kind === 'item') S.draft.unit = ''; }
+    renderAll();
+  }
+  async function delCat(kind, name) {
+    var key = kind + ':' + name;
+    if (S.catConfirm !== key) { S.catConfirm = key; renderAll(); setTimeout(function () { if (S.catConfirm === key) { S.catConfirm = null; renderAll(); } }, 4000); return; }
+    S.catConfirm = null;
+    var c = curCats();
+    if ((kind === 'sabor' ? c.sabores.length : kind === 'canal' ? c.canais.length : c.itens.length) <= 1) { toast(kind === 'sabor' ? 'Mantenha ao menos um sabor.' : kind === 'canal' ? 'Mantenha ao menos um canal.' : 'Mantenha ao menos um insumo.'); renderAll(); return; }
+    if (kind === 'sabor') c.sabores = c.sabores.filter(function (n) { return n !== name; }); else if (kind === 'canal') c.canais = c.canais.filter(function (n) { return n !== name; }); else c.itens = c.itens.filter(function (x) { return x.name !== name; });
+    await saveCats(c, 'Removido. O histórico continua salvo.');
+    renderAll();
+  }
+  async function saveCat() {
+    var ed = S.catEdit; if (!ed || !S.db || !S.canWrite) return;
+    var name = ($('catEditName').value || '').trim(), unit = $('catEditUnit') ? $('catEditUnit').value : '';
+    var err = nameError(ed.kind, name, ed.name); if (err) { toast(err); return; }
+    var old = ed.name, renamed = name !== old, oldMeta = ed.kind === 'sabor' ? metas()[old] : null, c = curCats();
+    if (ed.kind === 'sabor') c.sabores = c.sabores.map(function (n) { return n === old ? name : n; });
+    else if (ed.kind === 'canal') c.canais = c.canais.map(function (n) { return n === old ? name : n; });
+    else c.itens = c.itens.map(function (x) { return x.name === old ? { name: name, unit: unit } : x; });
+    if (!(await saveCats(c, 'Categoria atualizada'))) return;
+    S.catEdit = null;
+    if (renamed) {
+      var rows = S.all.filter(function (e) { return ed.kind === 'sabor' ? (e.tipo === 'venda' && e.sabor === old) : ed.kind === 'canal' ? (e.tipo === 'venda' && e.canal === old) : (e.tipo === 'gasto' && e.item === old); });
+      try {
+        for (var i = 0; i < rows.length; i++) await S.db.doc('lancamentos/' + rows[i].id).update(ed.kind === 'sabor' ? { sabor: name } : ed.kind === 'canal' ? { canal: name } : { item: name });
+        if (ed.kind === 'sabor') { var m = Object.assign({}, S.metas || {}); delete m[old]; if (oldMeta > 0) m[name] = oldMeta; await S.db.doc('config/metas').set(m); }
+      } catch (e) { toast('Categoria salva, mas alguns lançamentos antigos mantiveram o nome anterior.'); }
+    }
+    renderAll();
+  }
+  function catInput(ev) {
+    var t = ev.target;
+    if (t.id === 'newSabor') S.draft.sabor = t.value; else if (t.id === 'newItem') S.draft.item = t.value; else if (t.id === 'newCanal') S.draft.canal = t.value; else if (t.id === 'newUnit') S.draft.unit = t.value;
+    else if (t.id === 'catEditName') S.editDraft.name = t.value; else if (t.id === 'catEditUnit') S.editDraft.unit = t.value;
+  }
+  $('cats').addEventListener('input', catInput);
+  $('cats').addEventListener('change', catInput);
+  $('cats').addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter') return;
+    var id = ev.target.id;
+    if (id === 'newSabor') { ev.preventDefault(); addCat('sabor'); } else if (id === 'newItem') { ev.preventDefault(); addCat('item'); } else if (id === 'newCanal') { ev.preventDefault(); addCat('canal'); } else if (id === 'catEditName') { ev.preventDefault(); saveCat(); }
+  });
+  $('cats').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-act]'); if (!b || !S.db) return;
+    var act = b.getAttribute('data-act'), kind = b.getAttribute('data-kind'), name = b.getAttribute('data-name');
+    if (act === 'addCat') addCat(kind);
+    else if (act === 'delCat') delCat(kind, name);
+    else if (act === 'editCat') {
+      var cur = kind !== 'item' ? { name: name, unit: '' } : ITENS_LIST.filter(function (x) { return x.name === name; })[0] || { name: name, unit: '' };
+      S.catEdit = { kind: kind, name: name }; S.editDraft = { name: cur.name, unit: cur.unit || '' }; S.catConfirm = null; renderAll();
+      var inp = $('catEditName'); if (inp) { inp.focus(); inp.select(); }
+    }
+    else if (act === 'cancelCat') { S.catEdit = null; renderAll(); }
+    else if (act === 'saveCat') saveCat();
+  });
+
+  /* eventos */
+  $('segVenda').onclick = function () { setTipo('venda'); };
+  $('segGasto').onclick = function () { setTipo('gasto'); };
+  ['qtd', 'preco', 'valor'].forEach(function (id) { $(id).addEventListener('input', prev); });
+  $('sabor').addEventListener('change', fillPrice);
+  $('item').addEventListener('change', itemChanged);
+  $('form').addEventListener('submit', submit);
+  $('prev').onclick = function () { S.ym = shiftMonth(S.ym, -1); S.showAll = false; renderAll(); };
+  $('next').onclick = function () { S.ym = shiftMonth(S.ym, 1); S.showAll = false; renderAll(); };
+  $('more').onclick = function () { S.showAll = !S.showAll; renderAll(); };
+  $('copy').onclick = async function () {
+    var el = $('resumo');
+    try { await navigator.clipboard.writeText(el.textContent); toast('Resumo copiado'); }
+    catch (e) { try { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (x) {} toast('Texto selecionado. Copie manualmente.'); }
+  };
+  $('hero').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-act]'); if (!b) return;
+    var act = b.getAttribute('data-act'), key = b.getAttribute('data-key');
+    if (act === 'editMeta') { S.editing = key; S.editVal = String(metas()[key]).replace('.', ','); S.justOpened = true; renderAll(); }
+    else if (act === 'cancelMeta') { S.editing = null; renderAll(); }
+    else if (act === 'saveMeta') saveMeta(key);
+  });
+  $('list').addEventListener('click', async function (ev) {
+    var b = ev.target.closest('button[data-act]'); if (!b || !S.db) return;
+    var id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
+    try {
+      if (act === 'paid') { await S.db.doc('lancamentos/' + id).update({ pago: true }); toast('Marcado como recebido'); }
+      else if (act === 'del') {
+        if (S.confirmDel !== id) { S.confirmDel = id; renderAll(); setTimeout(function () { if (S.confirmDel === id) { S.confirmDel = null; renderAll(); } }, 4000); return; }
+        S.confirmDel = null; await S.db.doc('lancamentos/' + id).delete(); toast('Lançamento apagado');
+      }
+    } catch (e) { toast('Não consegui concluir. Tente de novo.'); }
+  });
+
+  /* início */
+  applyCats(); fillSelects();
+  $('data').value = todayStr();
+  setTipo('venda');
+  renderAll();
+  (async function () {
+    var db = null, user = null;
+    db = window.GeleiasDb; user = { can: async function () { return true; } };
+    S.db = db;
+    if (!db) { S.loaded = true; renderAll(); return; }
+    try { var can = user && user.can ? await user.can('data.write') : null; if (can === false) S.canWrite = false; } catch (e) {}
+    slowTimer = setTimeout(function () { if (!S.loaded) { S.slow = true; renderAll(); } }, 10000);
+    var firstSnap = true;
+    db.collection('lancamentos').orderBy('data', 'desc').limit(1000).onSnapshot(function (snap) {
+      S.all = snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; });
+      S.loaded = true; S.slow = false; S.err = false; clearTimeout(slowTimer);
+      if (firstSnap) { firstSnap = false; fillPrice(); }
+      renderAll();
+    }, function () { S.loaded = true; S.err = true; renderAll(); });
+    db.doc('config/metas').onSnapshot(function (snap) {
+      var o = snap.exists ? snap.data() : null;
+      S.metas = null;
+      if (o) { var mm = {}; Object.keys(o).forEach(function (k) { if (+o[k] > 0) mm[k] = +o[k]; }); S.metas = mm; }
+      renderAll();
+    }, function () {});
+    db.doc('config/categorias').onSnapshot(function (snap) {
+      var o = snap.exists ? snap.data() : null, ok = o && Array.isArray(o.sabores) && Array.isArray(o.itens);
+      S.cats = ok ? {
+        sabores: o.sabores.filter(function (n) { return typeof n === 'string' && n; }),
+        canais: Array.isArray(o.canais) ? o.canais.filter(function (n) { return typeof n === 'string' && n; }) : [],
+        itens: o.itens.filter(function (x) { return x && typeof x.name === 'string' && x.name; }).map(function (x) { return { name: x.name, unit: typeof x.unit === 'string' ? x.unit : '' }; })
+      } : null;
+      applyCats(); fillSelects(); renderAll();
+    }, function () {});
+  })();
+})();
+</script>
+</body>
+</html>
