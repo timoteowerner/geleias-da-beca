@@ -18,11 +18,9 @@
     }
   ],
   "routes": [{ "pattern": "geleias.familiawerner.org", "custom_domain": true }],
-  // Preencha depois de criar o aplicativo no Cloudflare Access (Zero Trust).
-  // TEAM_DOMAIN: algo como "seu-time.cloudflareaccess.com". POLICY_AUD: "Application Audience (AUD) Tag".
-  // Enquanto estiverem vazios, a API fica fechada.
+  // Cloudflare Access (Zero Trust): domínio do time e AUD da aplicação "Geleias da Beca".
   "vars": {
-    "TEAM_DOMAIN": "",
-    "POLICY_AUD": ""
+    "TEAM_DOMAIN": "cool-band-b0ac.cloudflareaccess.com",
+    "POLICY_AUD": "00b16ce0458e7c71412274f37b60a7d64401d4b9b164fdd4d69baea786de23f7"
   }
 }
